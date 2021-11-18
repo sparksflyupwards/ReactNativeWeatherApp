@@ -1,9 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { TouchableOpacity, Modal, StyleSheet, Text, View, FlatList, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
-
-
-
-
+import { TouchableOpacity, Modal, StyleSheet, Text, Image, View, FlatList, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
 
 
  export default function App() {
@@ -11,12 +7,6 @@ import { TouchableOpacity, Modal, StyleSheet, Text, View, FlatList, SafeAreaView
   const DATA = [
   
   ];
-  
-
-
-
-  
-
   const [weather, setWeather] = useState(DATA);
   const [weeklyWeather, setWeeklyWeather] = useState(DATA);
 
@@ -36,35 +26,7 @@ import { TouchableOpacity, Modal, StyleSheet, Text, View, FlatList, SafeAreaView
     .finally(()=>{
 
 
-      //get feels like and icon and date
-      let i = 0;
-   
-      for(let day of weather.daily){
-        
-        let unix_time_stamp = day.dt;
-        let time_mili_seconds = unix_time_stamp * 1000 ;
-        let day_date = new Date(time_mili_seconds);
-        
-        
-        let feels_like = day.feels_like.eve;
-        let weather_description = day.weather[0].description;
-        let weather_icon = day.weather[0].icon
-        
-        let newDayWeather = {
-          id: i,
-          date: day_date,
-          feels_like: feels_like,
-          weather_description: weather_description,
-          weather_icon: weather_icon
-        }
-
-        i++;
-        setWeeklyWeather([...weeklyWeather, newDayWeather])
-      }
-
-     
-
-      return setIsLoading(false)
+      return;
     }
    );
 
@@ -80,6 +42,15 @@ return (
 
     <TouchableOpacity style={styles.item} onPress={(item)=>onPress(post)}>
       <Text style={styles.title}>{item.feels_like}</Text>
+      
+      <Image 
+      style={styles.weatherImage}
+      source ={{
+        
+        uri: "http://openweathermap.org/img/wn/"+item.weather_icon+"@2x.png"
+        
+      }}/>
+   
     </TouchableOpacity>
 
 )};
@@ -93,10 +64,48 @@ return (
 
   useEffect(()=>{
     getWeatherData("toronto")
-    .then(()=>
-    console.log(
-      "weather"
-    )
+    .then(()=>{
+        //get feels like and icon and date
+      let i = 0;
+      let weekly_weather = []
+      if(weather.daily != undefined){
+        for(let day of weather.daily){
+     
+          let unix_time_stamp = day.dt;
+          let time_mili_seconds = unix_time_stamp * 1000 ;
+          let day_date = new Date(time_mili_seconds);
+          
+          
+          let feels_like = day.feels_like.eve;
+          let weather_description = day.weather[0].description;
+          let weather_icon = day.weather[0].icon
+          
+          let newDayWeather = {
+            id: i++,
+            date: day_date,
+            feels_like: feels_like,
+            weather_description: weather_description,
+            weather_icon: weather_icon
+          }
+  
+          console.log(newDayWeather.id)
+  
+          weekly_weather = [...weekly_weather, newDayWeather];
+    
+        }
+        console.log(weekly_weather)
+        setWeeklyWeather(weekly_weather);
+      }
+      
+
+     
+
+        setIsLoading(false)
+    }
+
+
+
+    
     )
   }, []);
 
@@ -147,6 +156,10 @@ const styles = StyleSheet.create({
   },
   title:{
     fontSize:28,
+  },
+  weatherImage: {
+    width: 80,
+    height: 80,
   },
   modalView: {
     margin: 20,
