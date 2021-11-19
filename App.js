@@ -15,7 +15,7 @@ import { TouchableOpacity, Modal, StyleSheet, Text, Image, View, FlatList, SafeA
 
  
   const getWeatherData = async (city)=>{
-    const api_key = "dc59a7f25db8c6bd34e3a18d78ffc24c";
+    const api_key = "ENTER_API_KEY";
     //const url  = `http://api.openweathermap.org/data/2.5/weather?q=${city.city},,&units=metric&appid=${api_key}`
     const url = "https://api.openweathermap.org/data/2.5/onecall?lat=33.44&lon=-94.04&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
 
