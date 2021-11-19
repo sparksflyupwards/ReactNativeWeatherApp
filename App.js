@@ -141,18 +141,18 @@ return (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FF6663',
     alignItems: 'center',
     justifyContent: 'center',
     color: "white",
+    alignItems: 'stretch',
     marginTop: StatusBar.currentHeight || 0,
   },
   item:{
-    backgroundColor:'#ccaacc',
+    backgroundColor:'#FEFFFE',
     padding: 20,
-
-    marginHorizontal: 16,
-    marginVertical:8,
+    width: '100%',
+    marginVertical:2,
   },
   title:{
     fontSize:28,
