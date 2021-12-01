@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { TouchableOpacity, Modal, StyleSheet, Text, Image, View, FlatList, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 
 
  export default function App() {
@@ -15,9 +16,11 @@ import { TouchableOpacity, Modal, StyleSheet, Text, Image, View, FlatList, SafeA
 
  
   const getWeatherData = async (city)=>{
-    const api_key = "ENTER_API_KEY";
+    
+
+    const api_key = "dc59a7f25db8c6bd34e3a18d78ffc24c";
     //const url  = `http://api.openweathermap.org/data/2.5/weather?q=${city.city},,&units=metric&appid=${api_key}`
-    const url = "https://api.openweathermap.org/data/2.5/onecall?lat=33.44&lon=-94.04&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
+    const url = "https://api.openweathermap.org/data/2.5/onecall?lat=43.65&lon=-79.38&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
 
     
     await fetch(url).then((response)=>response.json())
@@ -59,10 +62,16 @@ return (
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [selectedItem, setSelected] = useState(-1);
+  const [ location, setLocation] = useState(null);
   
 
 
   useEffect(()=>{
+    //new Promise ((resolve, reject) =>{
+   //   _requestLocation(resolve)
+   // }).then((location)=>console.log("LOC: "+location));
+
+
     getWeatherData("toronto")
     .then(()=>{
         //get feels like and icon and date
@@ -75,8 +84,8 @@ return (
           let time_mili_seconds = unix_time_stamp * 1000 ;
           let day_date = new Date(time_mili_seconds);
           
-          
-          let feels_like = day.feels_like.eve;
+          //convert from Kelvin to Celsius 
+          let feels_like = Math.round(day.feels_like.eve - 273.15);
           let weather_description = day.weather[0].description;
           let weather_icon = day.weather[0].icon
           
@@ -117,6 +126,38 @@ return (
     onPress={(item)=>setSelected(item.id)}></Row>
     )
   }
+
+/** 
+ let _requestLocation = (resolve) => {
+    
+
+    GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 150000,
+    })
+        .then(location => {
+            setLocation(location);
+            resolve(location)
+        })
+        .catch(ex => {
+            const { code, message } = ex;
+            console.warn(code, message);
+            if (code === 'CANCELLED') {
+                Alert.alert('Location cancelled by user or by another request');
+            }
+            if (code === 'UNAVAILABLE') {
+                Alert.alert('Location service is disabled or unavailable');
+            }
+            if (code === 'TIMEOUT') {
+                Alert.alert('Location request timed out');
+            }
+            if (code === 'UNAUTHORIZED') {
+                Alert.alert('Authorization denied');
+            }
+            setLocation(null);
+        });
+}
+*/
 
   return (
     <SafeAreaView style={styles.container}>
