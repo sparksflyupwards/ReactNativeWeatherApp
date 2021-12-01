@@ -45,7 +45,7 @@ return (
 
     <TouchableOpacity style={styles.item} onPress={(item)=>onPress(post)}>
             <Text style={styles.title}>{item.day_of_week}</Text>
-      <Text style={styles.title}>{item.feels_like}</Text>
+      <Text style={styles.feelsLikeText}>{item.feels_like + " C"}</Text>
       
       <Image 
       style={styles.weatherImage}
@@ -77,9 +77,6 @@ return (
 
 
   useEffect(()=>{
-    //new Promise ((resolve, reject) =>{
-   //   _requestLocation(resolve)
-   // }).then((location)=>console.log("LOC: "+location));
 
 
     getWeatherData("toronto")
@@ -208,6 +205,10 @@ const styles = StyleSheet.create({
   },
   title:{
     fontSize:28,
+  },
+  feelsLikeText: {
+    fontSize:20,
+
   },
   weatherImage: {
     width: 80,
