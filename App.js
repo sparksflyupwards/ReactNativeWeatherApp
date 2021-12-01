@@ -44,6 +44,7 @@ const Row = ({item, onPress})=>{
 return (
 
     <TouchableOpacity style={styles.item} onPress={(item)=>onPress(post)}>
+            <Text style={styles.title}>{item.day_of_week}</Text>
       <Text style={styles.title}>{item.feels_like}</Text>
       
       <Image 
@@ -63,7 +64,16 @@ return (
   const [isError, setIsError] = useState(false);
   const [selectedItem, setSelected] = useState(-1);
   const [ location, setLocation] = useState(null);
-  
+  const days_of_week = {
+    1: "Monday",
+    2: "Tuesday",
+    3: "Wednesday",
+    4: "Thursday",
+    5: "Friday",
+    6: "Satday",
+    7: "Sunday",
+
+  }
 
 
   useEffect(()=>{
@@ -83,6 +93,7 @@ return (
           let unix_time_stamp = day.dt;
           let time_mili_seconds = unix_time_stamp * 1000 ;
           let day_date = new Date(time_mili_seconds);
+          let day_of_week = days_of_week[day_date.getDay()];
           
           //convert from Kelvin to Celsius 
           let feels_like = Math.round(day.feels_like.eve - 273.15);
@@ -92,12 +103,12 @@ return (
           let newDayWeather = {
             id: i++,
             date: day_date,
+            day_of_week: day_of_week,
             feels_like: feels_like,
             weather_description: weather_description,
             weather_icon: weather_icon
           }
   
-          console.log(newDayWeather.id)
   
           weekly_weather = [...weekly_weather, newDayWeather];
     
