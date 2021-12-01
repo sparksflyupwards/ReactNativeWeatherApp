@@ -1,3 +1,4 @@
+
 import React, {useState, useEffect} from 'react';
 import { TouchableOpacity, Modal, StyleSheet, Text, Image, View, FlatList, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
@@ -44,7 +45,9 @@ const Row = ({item, onPress})=>{
 return (
 
     <TouchableOpacity style={styles.item} onPress={(item)=>onPress(post)}>
-            <Text style={styles.title}>{item.day_of_week}</Text>
+            <Text style={styles.title}>{item.day_of_week}     
+            
+            <Text style={styles.weatherDescription}>          {item.weather_description}</Text></Text>
       <Text style={styles.feelsLikeText}>{item.feels_like + " C"}</Text>
       
       <Image 
@@ -209,6 +212,10 @@ const styles = StyleSheet.create({
   feelsLikeText: {
     fontSize:20,
 
+  },
+  weatherDescription:{
+    textAlign: "center",
+    color: "grey",
   },
   weatherImage: {
     width: 80,
