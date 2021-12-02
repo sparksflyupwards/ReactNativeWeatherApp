@@ -68,22 +68,28 @@ return (
   const [selectedItem, setSelected] = useState(-1);
   const [ location, setLocation] = useState(null);
   const days_of_week = {
+    0: "Sunday",
     1: "Monday",
     2: "Tuesday",
     3: "Wednesday",
     4: "Thursday",
     5: "Friday",
-    6: "Satday",
-    7: "Sunday",
+    6: "Saturday",
+  
 
   }
 
 
   useEffect(()=>{
 
-
+    console.log(
+      "useeffect"
+    )
     getWeatherData("toronto")
     .then(()=>{
+      console.log(
+        "gotweather"
+      )
         //get feels like and icon and date
       let i = 0;
       let weekly_weather = []
@@ -93,6 +99,7 @@ return (
           let unix_time_stamp = day.dt;
           let time_mili_seconds = unix_time_stamp * 1000 ;
           let day_date = new Date(time_mili_seconds);
+          console.log("DAY: "+day_date.getDay())
           let day_of_week = days_of_week[day_date.getDay()];
           
           //convert from Kelvin to Celsius 
@@ -176,11 +183,21 @@ return (
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
           <Text>Error loading data. Try again later.</Text>
+          <TouchableOpacity
+        style={styles.errorModalDismissButton}
+        onPress={()=>setIsError(false)}>
+          <Text>Dismiss</Text>
+        </TouchableOpacity>
         </View>
+   
         </View>
       </Modal>
       
-      {isLoading ? <><ActivityIndicator size='large' color='#00cccc'></ActivityIndicator><Text>Loading...</Text></> :
+      {isLoading ? <>
+      <ActivityIndicator size='large' color='#00cccc'>
+      </ActivityIndicator>
+      <Text>Loading...</Text>
+      </> :
       <>
         <Text>{selectedItem}</Text>
         <FlatList data={weeklyWeather} renderItem={renderRow} keyExtractor={item=>item.id}></FlatList>
@@ -235,6 +252,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5
+  },
+  errorModalDismissButton: {
+    alignItems: "center",
+    backgroundColor: "#3f50d0",
+    borderRadius: 20,
+    padding: 10
   },
   centeredView: {
     flex: 1,
