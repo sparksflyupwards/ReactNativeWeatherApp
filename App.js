@@ -1,7 +1,8 @@
 
+
 import React, {useState, useEffect} from 'react';
 import { TouchableOpacity, Modal, StyleSheet, Text, Image, View, FlatList, SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
+import * as Location from 'expo-location';
 
 
  export default function App() {
@@ -13,26 +14,74 @@ import Geolocation from 'react-native-geolocation-service';
   const [weeklyWeather, setWeeklyWeather] = useState(DATA);
 
 
-
-
- 
-  const getWeatherData = async (city)=>{
-    
-
+  const fetchData = async (city)=>{
+    getLocation();
     const api_key = "dc59a7f25db8c6bd34e3a18d78ffc24c";
     //const url  = `http://api.openweathermap.org/data/2.5/weather?q=${city.city},,&units=metric&appid=${api_key}`
     const url = "https://api.openweathermap.org/data/2.5/onecall?lat=43.65&lon=-79.38&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
-
+    let response = await fetch(url)
+    let weatherResponse = await response.json();
+    //console.log(weatherResponse.daily[0].feels_like + " ")
+    return weatherResponse;
     
-    await fetch(url).then((response)=>response.json())
-    .then((json)=>{setIsError(false); setWeather(json) })
-    .catch((err)=>{setIsError(true); setWeather([]); console.error(err);})
-    .finally(()=>{
+  }
+
+ 
+  const getWeatherData = async (city)=>{
+    const response = await fetchData(city)
+    .then(weather => {
+      setIsError(false); 
+      setWeather(weather) 
+    //console.log(weather.daily)
+
+    })
+    .catch((err)=>{
+      setIsError(true); setWeather([]); console.error(err);
+    })
+    
 
 
-      return;
+    //console.log(weather)
+    //get feels like and icon and date
+  let i = 0;
+  let weekly_weather = []
+  if(weather.daily != undefined){
+    for(let day of weather.daily){
+ 
+      let unix_time_stamp = day.dt;
+      let time_mili_seconds = unix_time_stamp * 1000 ;
+      let day_date = new Date(time_mili_seconds);
+     // console.log("DAY: "+day_date.getDay())
+      let day_of_week = days_of_week[day_date.getDay()];
+      
+      //convert from Kelvin to Celsius 
+      let feels_like = Math.round(day.feels_like.eve - 273.15);
+      let weather_description = day.weather[0].description;
+      let weather_icon = day.weather[0].icon
+      
+      let newDayWeather = {
+        id: i++,
+        date: day_date,
+        day_of_week: day_of_week,
+        feels_like: feels_like,
+        weather_description: weather_description,
+        weather_icon: weather_icon
+      }
+
+
+      weekly_weather = [...weekly_weather, newDayWeather];
+
     }
-   );
+    //console.log(weekly_weather)
+    setWeeklyWeather(weekly_weather);
+  }
+  
+
+ 
+    //console.log(weather)
+    setIsLoading(false)
+ 
+    
 
 
   }
@@ -40,7 +89,7 @@ import Geolocation from 'react-native-geolocation-service';
 
 
 const Row = ({item, onPress})=>{
-  console.log(item.feels_like)
+  //console.log(item.feels_like)
   const [post, setPost] = useState(item);
 return (
 
@@ -57,10 +106,20 @@ return (
         uri: "http://openweathermap.org/img/wn/"+item.weather_icon+"@2x.png"
         
       }}/>
+          <Text> 
+            {JSON.stringify(gpsLocation)}
+            </Text>
+        { gpsLocationFound && 
+                (<Text> 
+                 {JSON.stringify(gpsLocation) + "sdf "}
+                </Text>)
+        }
    
     </TouchableOpacity>
 
 )};
+
+
 
 
   const [isLoading, setIsLoading] = useState(true);
@@ -79,55 +138,39 @@ return (
 
   }
 
+  const [gpsLocation, setGpsLocation] = useState({lat:null, lng:null});
+  const [gpsLocationFound, setGpsLocationFound] = useState(false);
+
+  const getLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+      try{
+        let location = await Location.getCurrentPositionAsync({});
+      setGpsLocation(location);
+      setGpsLocationFound(true);
+      console.log("we found location")
+      console.log(location)
+      }
+      catch(e){
+        console.log(e)
+        setIsError(true)
+      }
+      
+    }
+
+
+  
+
 
   useEffect(()=>{
 
-    console.log(
-      "useeffect"
-    )
+  
     getWeatherData("toronto")
-    .then(()=>{
-      console.log(
-        "gotweather"
-      )
-        //get feels like and icon and date
-      let i = 0;
-      let weekly_weather = []
-      if(weather.daily != undefined){
-        for(let day of weather.daily){
+    .then((weatherData)=>{
      
-          let unix_time_stamp = day.dt;
-          let time_mili_seconds = unix_time_stamp * 1000 ;
-          let day_date = new Date(time_mili_seconds);
-          console.log("DAY: "+day_date.getDay())
-          let day_of_week = days_of_week[day_date.getDay()];
-          
-          //convert from Kelvin to Celsius 
-          let feels_like = Math.round(day.feels_like.eve - 273.15);
-          let weather_description = day.weather[0].description;
-          let weather_icon = day.weather[0].icon
-          
-          let newDayWeather = {
-            id: i++,
-            date: day_date,
-            day_of_week: day_of_week,
-            feels_like: feels_like,
-            weather_description: weather_description,
-            weather_icon: weather_icon
-          }
-  
-  
-          weekly_weather = [...weekly_weather, newDayWeather];
-    
-        }
-        console.log(weekly_weather)
-        setWeeklyWeather(weekly_weather);
-      }
-      
-
-     
-
-        setIsLoading(false)
     }
 
 
@@ -199,9 +242,19 @@ return (
       <Text>Loading...</Text>
       </> :
       <>
-        <Text>{selectedItem}</Text>
-        <FlatList data={weeklyWeather} renderItem={renderRow} keyExtractor={item=>item.id}></FlatList>
-      </>
+        { weeklyWeather && 
+        (<View>
+          
+      
+               <Text>{selectedItem}</Text>
+              <FlatList data={weeklyWeather} renderItem={renderRow} keyExtractor={item=>item.id}></FlatList>
+        </View>
+        
+   )}
+
+   
+      
+        </>
       }
     </SafeAreaView>
   );
