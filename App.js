@@ -15,13 +15,22 @@ import * as Location from 'expo-location';
 
 
   const fetchData = async (city)=>{
-    getLocation();
+    
     const api_key = "dc59a7f25db8c6bd34e3a18d78ffc24c";
-    //const url  = `http://api.openweathermap.org/data/2.5/weather?q=${city.city},,&units=metric&appid=${api_key}`
-    const url = "https://api.openweathermap.org/data/2.5/onecall?lat=43.65&lon=-79.38&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
-    let response = await fetch(url)
+
+    let url 
+    if(city!= undefined && city.latitude != undefined && city.longitude != undefined){
+      url = "https://api.openweathermap.org/data/2.5/onecall?lat="+ city.latitude +"&lon="+city.longitude+"&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
+   
+    }
+    else {
+      url = "https://api.openweathermap.org/data/2.5/onecall?lat=43.65&lon=-79.38&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
+   
+    }
+
+
+     let response = await fetch(url)
     let weatherResponse = await response.json();
-    //console.log(weatherResponse.daily[0].feels_like + " ")
     return weatherResponse;
     
   }
@@ -41,7 +50,6 @@ import * as Location from 'expo-location';
     
 
 
-    //console.log(weather)
     //get feels like and icon and date
   let i = 0;
   let weekly_weather = []
@@ -153,6 +161,7 @@ return (
       setGpsLocationFound(true);
       console.log("we found location")
       console.log(location)
+      return location;
       }
       catch(e){
         console.log(e)
@@ -166,17 +175,15 @@ return (
 
 
   useEffect(()=>{
-
+    getLocation().then((loc)=>{
+      console.log(loc + 'before then ')
+      getWeatherData(loc)
+        .then((weatherData)=>{});
   
-    getWeatherData("toronto")
-    .then((weatherData)=>{
-     
-    }
+  
 
 
-
-    
-    )
+    });
   }, []);
 
 
