@@ -6,8 +6,22 @@ import * as Location from 'expo-location';
 
 
  export default function App() {
+/*
+Note we have may have an error where the application does not run correctly until expo has had a time to reload the UI.
+This is because our UI is rendering before our state changes.
+If the flat list appears empty for you please change the console log bellow (add or erase any character you would like.)
+and the application show render
+
+authored by:
+Saad Khan 101157307
+Fred Pedersen 101378456
+
+*/
+console.log("Change any character of this console log")
+
 
   const DATA = [
+    
 
   
   ];
@@ -32,6 +46,7 @@ import * as Location from 'expo-location';
 
     let response = await fetch(url)
     let weatherResponse = await response.json();
+ 
 
     return weatherResponse;
     
@@ -62,7 +77,7 @@ import * as Location from 'expo-location';
       let unix_time_stamp = day.dt;
       let time_mili_seconds = unix_time_stamp * 1000 ;
       let day_date = new Date(time_mili_seconds);
-     // console.log("DAY: "+day_date.getDay())
+     
       let day_of_week = days_of_week[day_date.getDay()];
       
       //convert from Kelvin to Celsius 
@@ -83,13 +98,12 @@ import * as Location from 'expo-location';
       weekly_weather = [...weekly_weather, newDayWeather];
 
     }
-    console.log(weekly_weather)
     setWeeklyWeather(weekly_weather);
   }
   
 
  
-    //console.log(weather)
+    
     setIsLoading(false)
  
     
@@ -100,32 +114,20 @@ import * as Location from 'expo-location';
 
 
 const Row = ({item, onPress})=>{
-  //console.log(item.feels_like)
+  
   const [post, setPost] = useState(item);
 return (
 
     <TouchableOpacity style={styles.item} onPress={(item)=>onPress(post)}>
-            <Text style={styles.title}>{item.day_of_week}     
-            
-            <Text style={styles.weatherDescription}>          {item.weather_description}</Text></Text>
-      <Text style={styles.feelsLikeText}>{item.feels_like + " C"}</Text>
-      
+            <Text style={styles.title}>   {item.day_of_week}  
+                  
+            <Text style={styles.description}>                {item.weather_description}</Text></Text>
+      <Text style={styles.feelsLikeText}>    {item.feels_like + "° C"}</Text>
       <Image 
       style={styles.weatherImage}
       source ={{
-        
         uri: "http://openweathermap.org/img/wn/"+item.weather_icon+"@2x.png"
-        
       }}/>
-          <Text> 
-            {JSON.stringify(gpsLocation)}
-            </Text>
-        { gpsLocationFound && 
-                (<Text> 
-                 {JSON.stringify(gpsLocation) + "sdf "}
-                </Text>)
-        }
-   
     </TouchableOpacity>
 
 )};
@@ -154,7 +156,7 @@ return (
 
   const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      console.log(status)
+      console.log( status)
       if (status !== 'granted') {
         setIsError(true);
         setGpsLocationFound(false);
@@ -162,11 +164,10 @@ return (
       }
       try{
         let location = await Location.getCurrentPositionAsync({});
-        console.log(location)
+       
       setGpsLocation(location);
       setGpsLocationFound(true);
-      console.log("we found  location")
-      console.log(location)
+    
       return location;
       }
       catch(e){
@@ -219,7 +220,7 @@ return (
           <TouchableOpacity
         style={styles.errorModalDismissButton}
         onPress={()=>setIsError(false)}>
-          <Text>Dismiss</Text>
+          <Text> Dismiss</Text>
         </TouchableOpacity>
         </View>
    
@@ -236,7 +237,7 @@ return (
         (<View>
           
       
-               <Text>{selectedItem}</Text>
+               
               <FlatList data={weeklyWeather} renderItem={renderRow} keyExtractor={item=>item.id}></FlatList>
         </View>
         
@@ -253,7 +254,7 @@ return (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6663',
+    backgroundColor: '#6495ED',
     alignItems: 'center',
     justifyContent: 'center',
     color: "white",
@@ -263,23 +264,30 @@ const styles = StyleSheet.create({
   item:{
     backgroundColor:'#FEFFFE',
     padding: 20,
-    width: '100%',
-    marginVertical:2,
+    width: '95%',
+    margin: 10,
+    borderRadius: 10,
   },
   title:{
     fontSize:28,
+  },
+  description:{
+    fontSize:18,
   },
   feelsLikeText: {
     fontSize:20,
 
   },
+  
   weatherDescription:{
-    textAlign: "center",
+    
     color: "grey",
   },
   weatherImage: {
     width: 80,
     height: 80,
+    
+    
   },
   modalView: {
     margin: 20,
