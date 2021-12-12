@@ -8,6 +8,7 @@ import * as Location from 'expo-location';
  export default function App() {
 
   const DATA = [
+
   
   ];
   const [weather, setWeather] = useState(DATA);
@@ -16,32 +17,34 @@ import * as Location from 'expo-location';
 
   const fetchData = async (city)=>{
     
-    const api_key = "dc59a7f25db8c6bd34e3a18d78ffc24c";
+    const api_key = "c079791633a7b22588ecb7ef1d77301e";
 
     let url 
     if(city!= undefined && city.latitude != undefined && city.longitude != undefined){
-      url = "https://api.openweathermap.org/data/2.5/onecall?lat="+ city.latitude +"&lon="+city.longitude+"&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
+      url = "https://api.openweathermap.org/data/2.5/onecall?lat="+ city.latitude +"&lon="+city.longitude+"&appid=" + api_key;
    
     }
     else {
-      url = "https://api.openweathermap.org/data/2.5/onecall?lat=43.65&lon=-79.38&appid=dc59a7f25db8c6bd34e3a18d78ffc24c";
+      url = "https://api.openweathermap.org/data/2.5/onecall?lat=43.65&lon=-79.38&appid=" + api_key;
    
     }
 
 
-     let response = await fetch(url)
+    let response = await fetch(url)
     let weatherResponse = await response.json();
+
     return weatherResponse;
     
   }
 
  
   const getWeatherData = async (city)=>{
+    console.log(city + " ")
     const response = await fetchData(city)
     .then(weather => {
       setIsError(false); 
       setWeather(weather) 
-    //console.log(weather.daily)
+    console.log(weather)
 
     })
     .catch((err)=>{
@@ -80,7 +83,7 @@ import * as Location from 'expo-location';
       weekly_weather = [...weekly_weather, newDayWeather];
 
     }
-    //console.log(weekly_weather)
+    console.log(weekly_weather)
     setWeeklyWeather(weekly_weather);
   }
   
@@ -151,21 +154,26 @@ return (
 
   const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
+      console.log(status)
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+        setIsError(true);
+        setGpsLocationFound(false);
+        return -1;
       }
       try{
         let location = await Location.getCurrentPositionAsync({});
+        console.log(location)
       setGpsLocation(location);
       setGpsLocationFound(true);
-      console.log("we found location")
+      console.log("we found  location")
       console.log(location)
       return location;
       }
       catch(e){
         console.log(e)
+        setGpsLocationFound(false);
         setIsError(true)
+        return -1;
       }
       
     }
@@ -176,15 +184,20 @@ return (
 
   useEffect(()=>{
     getLocation().then((loc)=>{
-      console.log(loc + 'before then ')
-      getWeatherData(loc)
-        .then((weatherData)=>{});
+      if(loc==-1){
+        loc = {lat: 49, lng: -70}
   
+      }
+      getWeatherData(loc)
+      .then((weatherData)=>{console.log("we got: "+weatherData)});
+      
   
 
 
     });
   }, []);
+
+
 
 
   const renderRow = ({item})=>{
@@ -195,37 +208,7 @@ return (
     )
   }
 
-/** 
- let _requestLocation = (resolve) => {
-    
 
-    GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 150000,
-    })
-        .then(location => {
-            setLocation(location);
-            resolve(location)
-        })
-        .catch(ex => {
-            const { code, message } = ex;
-            console.warn(code, message);
-            if (code === 'CANCELLED') {
-                Alert.alert('Location cancelled by user or by another request');
-            }
-            if (code === 'UNAVAILABLE') {
-                Alert.alert('Location service is disabled or unavailable');
-            }
-            if (code === 'TIMEOUT') {
-                Alert.alert('Location request timed out');
-            }
-            if (code === 'UNAUTHORIZED') {
-                Alert.alert('Authorization denied');
-            }
-            setLocation(null);
-        });
-}
-*/
 
   return (
     <SafeAreaView style={styles.container}>
